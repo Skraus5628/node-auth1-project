@@ -1,18 +1,17 @@
 const express = require("express")
-const helmet = require("helmet")
 const cors = require("cors")
-const authRouter = require("./auth/auth-router")
-const usersRouter = require("./users/users-router")
+const userRouter = require("./users/userRoute")
+const userActions = require("./users/userActions")
 
 const server = express()
 const port = process.env.PORT || 4000
 
 server.use(cors())
-server.use(helmet())
 server.use(express.json())
 
-server.use("/login", authRouter)
-server.use("/users", usersRouter)
+
+server.use('/api', userActions)
+server.use("/api/users", userRouter)
 
 server.get("/", (req, res, next) => {
 	res.json({
@@ -20,12 +19,6 @@ server.get("/", (req, res, next) => {
 	})
 })
 
-server.use((err, req, res, next) => {
-	console.log(err)
-	res.status(500).json({
-		message: "Something went wrong",
-	})
-})
 
 server.listen(port, () => {
 	console.log(`Running at http://localhost:${port}`)
