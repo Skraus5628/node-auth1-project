@@ -1,7 +1,9 @@
 const express = require('express');
 const Users = require('./userModel.js');
 const bcrypt = require('bcryptjs');
-const router = express();
+const { sessions, auth } = require('../middleware/auth')
+
+const router = express.Router();
 
 
 router.post("/register", async (req, res, next) => {
@@ -21,7 +23,7 @@ router.post("/register", async (req, res, next) => {
 	}
 })
 
-module.exports = router
+
 
 router.post("/login", async (req, res, next) => {
 	try {
@@ -36,6 +38,9 @@ router.post("/login", async (req, res, next) => {
 			})
 		}
 
+		req.session.user = user
+		
+
 		res.json({
 			message: `Welcome ${user.username}!`,
 		})
@@ -44,8 +49,16 @@ router.post("/login", async (req, res, next) => {
 	}
 })
 
-router.post('/logout', (req, res) => {
-
+router.post('/logout', auth(), (req, res) => {
+	req.session.destroy((err) =>{
+		if (err){
+			next(err)
+		} else {
+			res.json({
+				message: "Successfully logged out!"
+			})
+		}
+	})
 });
 
 module.exports = router; 
