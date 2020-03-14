@@ -1,15 +1,25 @@
+require('dotenv').config();
+
 const express = require("express")
 const session = require("express-session")
 const KnexSessionStore = require("connect-session-knex")(session)
 const cors = require("cors")
+const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+
 const userRouter = require("./users/userRoute")
 const userActions = require("./users/userActions")
 const dbConfig = require("./data/config")
+
 
 const server = express()
 const port = process.env.PORT || 4000
 
 server.use(cors())
+// parse app/json
+server.use(bodyParser.json());
+// parse app/x-ww-form-urlenconded
+server.use(bodyParser.urlencoded({ extended: true }));
 server.use(express.json())
 server.use(session({
 	// overwrites the default cookie name, hides our stack better
@@ -37,7 +47,7 @@ server.use(session({
 server.use('/api', userActions)
 server.use("/api/users", userRouter)
 
-server.get("/", (req, res, next) => {
+server.get("/",(req, res, next) => {
 	res.json({
 		message: "We're all mad here...",
 	})
